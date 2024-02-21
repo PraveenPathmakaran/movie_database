@@ -7,7 +7,6 @@ import '../new_and_hot/screen_new_and_hot.dart';
 import '../search/screen_search.dart';
 import 'widgets/bottom_nav.dart';
 
-
 class ScreenMainPage extends StatelessWidget {
   ScreenMainPage({super.key});
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'widget/video_list_item.dart';
+import 'widgets/video_list_item.dart';
 
 class ScreenFastLaugh extends StatelessWidget {
   const ScreenFastLaugh({super.key});
@@ -8,10 +8,15 @@ class ScreenFastLaugh extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
+      body: SafeArea(
+          child: PageView(
         scrollDirection: Axis.vertical,
-        children: List.generate(10, (index) => VideoListItem(index: index)),
-      ),
+        children: List.generate(10, (index) {
+          return VideoListItem(
+            index: index,
+          );
+        }),
+      )),
     );
   }
 }
