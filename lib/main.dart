@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movie_db/application/downloads/downloads_bloc.dart';
+import 'package:movie_db/application/search/search_bloc.dart';
 
 import 'core/colors/colors.dart';
 import 'domain/di/injectable.dart';
@@ -20,9 +21,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<DownloadsBloc>(
-          create: (ctx) => getIt<DownloadsBloc>(),
-        )
+        BlocProvider<DownloadsBloc>(create: (ctx) => getIt<DownloadsBloc>()),
+        BlocProvider<SearchBloc>(create: (ctx) => getIt<SearchBloc>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
