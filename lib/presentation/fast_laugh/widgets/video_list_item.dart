@@ -1,7 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:movie_db/presentation/search/widgets/search_idle.dart';
+import 'package:movie_db/application/fastlaugh/fast_laugh_bloc.dart';
+import 'package:movie_db/core/strings.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../core/colors/colors.dart';
+import '../../../domain/downloads/model/downloads.dart';
+
+class VideoListItemInheritedWidget extends InheritedWidget {
+  final Downloads movieData;
+
+  const VideoListItemInheritedWidget({
+    super.key,
+    required this.movieData,
+    required super.child,
+  });
+
+  @override
+  bool updateShouldNotify(covariant VideoListItemInheritedWidget oldWidget) {
+    return oldWidget.movieData != movieData;
+  }
+
+  static VideoListItemInheritedWidget? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<VideoListItemInheritedWidget>();
+  }
+}
 
 class VideoListItem extends StatelessWidget {
   final int index;
@@ -9,11 +32,13 @@ class VideoListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final posterPath =
+        VideoListItemInheritedWidget.of(context)?.movieData.posterPath;
     return Stack(
       children: [
-        Container(
-          color: Colors.accents[index % Colors.accents.length],
-        ),
+        FastLaughVideoPlayer(
+            videoUrl: videoUrl[index % videoUrl.length],
+            onStateChanged: (value) {}),
         Align(
           alignment: Alignment.bottomCenter,
           child: Padding(
@@ -37,21 +62,24 @@ class VideoListItem extends StatelessWidget {
                 ),
                 //right side
 
-                const Column(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundImage: NetworkImage(imageuUrl),
+                        backgroundImage: posterPath == null
+                            ? null
+                            : NetworkImage("$imageAppendUrl$posterPath"),
                       ),
                     ),
-                    VideoActionsWidget(
+                    const VideoActionsWidget(
                         icon: Icons.emoji_emotions, title: 'LOL'),
-                    VideoActionsWidget(icon: Icons.add, title: 'My List'),
-                    VideoActionsWidget(icon: Icons.share, title: 'Share'),
-                    VideoActionsWidget(icon: Icons.play_arrow, title: 'Play'),
+                    const VideoActionsWidget(icon: Icons.add, title: 'My List'),
+                    const VideoActionsWidget(icon: Icons.share, title: 'Share'),
+                    const VideoActionsWidget(
+                        icon: Icons.play_arrow, title: 'Play'),
                   ],
                 )
               ],
@@ -86,6 +114,49 @@ class VideoActionsWidget extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class FastLaughVideoPlayer extends StatefulWidget {
+  final String videoUrl;
+  final void Function(bool isPlaying) onStateChanged;
+  const FastLaughVideoPlayer(
+      {super.key, required this.videoUrl, required this.onStateChanged});
+
+  @override
+  State<FastLaughVideoPlayer> createState() => _FastLaughVideoPlayerState();
+}
+
+class _FastLaughVideoPlayerState extends State<FastLaughVideoPlayer> {
+  late VideoPlayerController _videoPlayerController;
+
+  @override
+  void initState() {
+    _videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    _videoPlayerController.initialize().then((value) => setState(() {
+          _videoPlayerController.play();
+        }));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: double.infinity,
+      child: _videoPlayerController.value.isInitialized
+          ? VideoPlayer(_videoPlayerController)
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }
