@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_db/application/fastlaugh/fast_laugh_bloc.dart';
 import 'package:movie_db/core/strings.dart';
 import 'package:video_player/video_player.dart';
@@ -74,8 +75,30 @@ class VideoListItem extends StatelessWidget {
                             : NetworkImage("$imageAppendUrl$posterPath"),
                       ),
                     ),
-                    const VideoActionsWidget(
-                        icon: Icons.emoji_emotions, title: 'LOL'),
+                    BlocBuilder<FastLaughBloc, FastLaughState>(
+                      builder: (context, state) {
+                        if (state.likedVideoIds.contains(index)) {
+                          return GestureDetector(
+                            onTap: () {
+                              context
+                                  .read<FastLaughBloc>()
+                                  .add(FastLaughEvent.unlikeVideo(id: index));
+                            },
+                            child: const VideoActionsWidget(
+                                icon: Icons.favorite, title: 'Liked'),
+                          );
+                        }
+                        return GestureDetector(
+                          onTap: () {
+                            context
+                                .read<FastLaughBloc>()
+                                .add(FastLaughEvent.likeVideo(id: index));
+                          },
+                          child: const VideoActionsWidget(
+                              icon: Icons.emoji_emotions, title: 'LOL'),
+                        );
+                      },
+                    ),
                     const VideoActionsWidget(icon: Icons.add, title: 'My List'),
                     const VideoActionsWidget(icon: Icons.share, title: 'Share'),
                     const VideoActionsWidget(

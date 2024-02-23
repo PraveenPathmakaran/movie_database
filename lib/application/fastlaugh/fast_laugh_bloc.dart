@@ -30,5 +30,16 @@ class FastLaughBloc extends Bloc<FastLaughEvent, FastLaughState> {
           (sucess) =>
               emit(state.copyWith(isLoading: false, videosList: sucess)));
     });
+
+    on<_LikeVideo>((event, emit) {
+      final list = List<int>.from(state.likedVideoIds);
+      list.add(event.id);
+      emit(state.copyWith(likedVideoIds: list));
+    });
+    on<_UnlikeVideo>((event, emit) {
+      final list = List<int>.from(state.likedVideoIds);
+      list.remove(event.id);
+      emit(state.copyWith(likedVideoIds: list));
+    });
   }
 }
